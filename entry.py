@@ -4,51 +4,44 @@ import re
 import time
 
 def main():
-    print("Welcome! Press Enter/Return to progress through each step.")
-    while True:
-        try:
-            print("Please enter in the roles you'd like to randomize, one per line:")
-            role_input = ''
-            is_chaos_round = False
-            player_roles = []
-            # Get the roles that the user inputs
-            for line in iter(input, role_input):
-                player_roles.append(line)
-            # Get the number of players based on lines entered
-            player_count = len(player_roles)
-            print("Got it! We have {} players this round. Let's randomize!".format(player_count))
-            start = time.time()
-            # Check chaos
-            for role in player_roles:
-                if "/" in line:
-                    is_chaos_round = True
-                    break
-            if is_chaos_round:
-                player_roles = chaos_round(player_roles)
-            # Get a human readable list of player numbers, from 1 to player_count + 1 (0-14 becomes 1-15).
-            number_array = list(range(1, player_count + 1))
-            random.shuffle(number_array)
-            random.shuffle(player_roles)
-            # The numbers and roles are shuffled. Join them and sort by Player number.
-            final_roles = sorted(zip(number_array, player_roles))
-            end = time.time()
-            print("Alright, here's the rundown:")
-            for role in final_roles:
-                print(role)
-            print("Good Luck! (This took {} seconds to randomize)".format(end - start))
-            break
-        except KeyboardInterrupt:
-            print("\nkbye")
-            break
-        except:
-            print("Something broke. Give Steven this info {}".format(traceback.print_exc()))
-            break
+    print("Welcome!")
+    try:
+        print("Please enter in the roles you'd like to randomize, one player/potential role per line:")
+        role_input = ''
+        is_chaos_round = False
+        player_roles = []
+        # Get the roles that the user inputs
+        for line in iter(input, role_input):
+            player_roles.append(line)
+        # Get the number of players based on lines entered
+        player_count = len(player_roles)
+        print("Got it! We have {} players this round. Randomizing.".format(player_count))
+        start = time.time()
+        # Check chaos
+        for role in player_roles:
+            if "/" in line:
+                is_chaos_round = True
+                break
+        if is_chaos_round:
+            player_roles = chaos_round(player_roles)
+        # Get a human readable list of player numbers, from 1 to player_count + 1 (0-14 becomes 1-15).
+        number_array = list(range(1, player_count + 1))
+        random.shuffle(number_array)
+        random.shuffle(player_roles)
+        # The numbers and roles are shuffled. Join them and sort by Player number.
+        final_roles = sorted(zip(number_array, player_roles))
+        end = time.time()
+        print("Here's the rundown:")
+        for role in final_roles:
+            print(role)
+        print("Good Luck! (This took {} seconds to randomize)".format(end - start))
+    except KeyboardInterrupt:
+        print("\nkbye")
+    except:
+        print("Something broke. Give Steven this info {}".format(traceback.print_exc()))
 
 
 def chaos_round(role_list, drunk_enabled=True):
-    print("\n***************************************************")
-    print("Chaos round detected. If it's not a chaos round, don't submit roles with '/' in them.")
-    print("***************************************************\n")
     determined_roles = []
     index = 0
     while index < len(role_list):
@@ -74,6 +67,7 @@ def chaos_round(role_list, drunk_enabled=True):
     while drunk_enabled:
         drunk_index = random.randint(0, len(determined_roles)-1)
         # At the moment, if the role has the word Drunk in it, it can't be drunk.
+        # It makes sense when you look at the input...
         if "Drunk" in determined_roles[drunk_index]:
             continue
         determined_roles[drunk_index] = determined_roles[drunk_index] + " | Drunk"
