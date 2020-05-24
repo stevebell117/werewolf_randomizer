@@ -93,7 +93,7 @@ def role_select(roles, count):
         if roles[selected_index] == roles[-1]:
             if valid_limit:
                 selected_roles.append(roles[-1])
-                roles[-1] = roles[-1].replace(limit, limit - 1)
+                roles[-1] = roles[-1].replace(str(limit), str(limit - 1))
             else:
                 selected_roles.append(roles[selected_index])
                 count = count - 1
