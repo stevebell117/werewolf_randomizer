@@ -1,39 +1,25 @@
 import random
 import traceback
+import re
+import time
 
 def main():
     print("Welcome! Press Enter/Return to progress through each step.")
     while True:
         try:
-            player_count = int(input("Please enter the number of players: "))
-            break
-        except ValueError:
-            print("That's not a number. Try again please.")
-            continue
-    while True:
-        try:
-            print("So we have {} players. Cool. Now, please enter in the roles you'd like to randomize, one per line:".format(player_count))
+            print("Please enter in the roles you'd like to randomize, one per line:")
             role_input = ''
-            initial_confirm = True
             is_chaos_round = False
             index = 1 # gross
             player_roles = []
             for line in iter(input, role_input):
-                if initial_confirm:
-                    print("\nGot it. So the roles you've given me are:")
-                    initial_confirm = False
-                print("Role #{}: {}".format(index, line))
                 player_roles.append(line)
                 index = index + 1
-            if len(player_roles) != player_count:
-                print("The number of roles {} entered does not match the number of players {}. Let's try this again!".format(
-                    len(player_roles),
-                    player_count
-                ))
-                continue
-            confirm = input("Alright, look good? Y/n: ")
+            player_count = len(player_roles)
+            confirm = input("Got it! We have {} players this round. Sound good? Y/n: ".format(player_count))
             if confirm == "" or str.upper(confirm) == "Y":
                 print("Let's randomize this.")
+                start = time.time()
                 # Check chaos
                 for role in player_roles:
                     if "/" in line:
@@ -44,18 +30,23 @@ def main():
                         break
                 if is_chaos_round:
                     player_roles = chaos_round(player_roles)
+                    drunk_found = False
+                    while not drunk_found:
+                        drunk_index = random.randint(0, len(player_roles)-1)
+                        if "Drunk" in player_roles[drunk_index]:
+                            continue
+                        player_roles[drunk_index] = player_roles[drunk_index] + " | Drunk"
+                        drunk_found = True
                 number_array = list(range(1,player_count+1)) # humans hate index starting at 0
                 random.shuffle(number_array)
                 random.shuffle(player_roles)
                 final_roles = sorted(zip(number_array, player_roles))
+                end = time.time()
                 print("Alright, here's the rundown:")
                 for role in final_roles:
                     print(role)
-                confirm = input("Look good, or do you want to do this again? Y/n: ")
-                if confirm == "" or str.upper(confirm) == "Y":
-                    print("Awesome, good luck!")
-                    break
-                print("Damn, ok. Let's go again.\n**********************************************\n")
+                print("Good Luck! (This took {} seconds to randomize)".format(end - start))
+                break
             else:
                 print("Let's try this again then...")
                 continue
@@ -91,9 +82,11 @@ def role_select(roles, count):
     for i in range(0, count):
         selected_index = random.randint(0,count)
         if roles[selected_index] == roles[-1]:
-            if valid_limit:
-                selected_roles.append(roles[-1])
+            if valid_limit and limit > 0:
+                selected_roles.append(re.sub(r'x.', '', roles[-1]))
                 roles[-1] = roles[-1].replace(str(limit), str(limit - 1))
+            elif valid_limit and limit == 0:
+                del(roles[-1])
             else:
                 selected_roles.append(roles[selected_index])
                 count = count - 1
